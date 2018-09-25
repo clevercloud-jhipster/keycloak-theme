@@ -1,0 +1,6 @@
+{
+  "themes": [{
+    "name" : "clevercloud",
+    "types": [ "login" ]
+  }]
+}

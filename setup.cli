@@ -1,0 +1,22 @@
+/subsystem=datasources/data-source=KeycloakDS: remove()
+/subsystem=datasources/data-source=KeycloakDS: add(jndi-name=java:jboss/datasources/KeycloakDS,enabled=true,use-java-context=true,use-ccm=true, connection-url=jdbc:postgresql://${env.POSTGRESQL_ADDON_HOST:postgres}:${env.POSTGRESQL_ADDON_PORT:5432}/${env.POSTGRESQL_ADDON_DB:keycloak}${env.JDBC_PARAMS:}, driver-name=postgresql)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=user-name, value=${env.POSTGRESQL_ADDON_USER:keycloak})
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=password, value=${env.POSTGRESQL_ADDON_PASSWORD:password})
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=check-valid-connection-sql, value="SELECT 1")
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation, value=true)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation-millis, value=60000)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=flush-strategy, value=IdleConnections)
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql.jdbc, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+
+/subsystem=logging/logger=org.keycloak:add
+/subsystem=logging/logger=org.keycloak:write-attribute(name=level,value=${env.KEYCLOAK_LOGLEVEL:INFO})
+/subsystem=logging/root-logger=ROOT:change-root-log-level(level=${env.ROOT_LOGLEVEL:INFO})
+/subsystem=logging/root-logger=ROOT:remove-handler(name="FILE")
+/subsystem=logging/periodic-rotating-file-handler=FILE:remove
+/subsystem=logging/console-handler=CONSOLE:undefine-attribute(name=level)
+/subsystem=keycloak-server/spi=hostname:write-attribute(name=default-provider, value="${keycloak.hostname.provider:request}")
+/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.hostname,value="${keycloak.hostname.fixed.hostname:localhost}")
+/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.httpPort,value="${keycloak.hostname.fixed.httpPort:-1}")
+/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.httpsPort,value="${keycloak.hostname.fixed.httpsPort:-1}")
+/subsystem=undertow/server=default-server/http-listener=default: write-attribute(name=proxy-address-forwarding, value=true)
+/subsystem=undertow/server=default-server/https-listener=https: write-attribute(name=proxy-address-forwarding, value=true)
