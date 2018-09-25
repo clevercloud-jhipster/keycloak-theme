@@ -1,0 +1,1 @@
+$KEYCLOAK_HOME/bin/standalone.sh -b 0.0.0.0 --server-config standalone.xml -Dava.net.preferIPv6Addresses=false -Djava.net.preferIPv4Stack=true
